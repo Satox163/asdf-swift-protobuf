@@ -2,8 +2,7 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for swift-protobuf.
-GH_REPO="https://github.com/Satox163/swift-protobuf"
+GH_REPO="https://github.com/apple/swift-protobuf"
 TOOL_NAME="swift-protobuf"
 TOOL_TEST="swift-protobuf --help"
 
@@ -41,8 +40,7 @@ download_release() {
 	version="$1"
 	filename="$2"
 
-	# TODO: Adapt the release URL convention for swift-protobuf
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/archive/refs/tags/v${version}.zip"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
