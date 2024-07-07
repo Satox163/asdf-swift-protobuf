@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
-set -e
 
-curl -s "https://api.github.com/repos/apple/swift-protobuf/tags" | jq -r '.[].name'
+set -euo pipefail
+
+current_script_path=${BASH_SOURCE[0]}
+plugin_dir=$(dirname "$(dirname "$current_script_path")")
+
+# shellcheck source=../lib/utils.bash
+source "${plugin_dir}/lib/utils.bash"
+
+list_all_versions | sort_versions | xargs echo
