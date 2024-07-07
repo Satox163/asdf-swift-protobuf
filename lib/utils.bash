@@ -40,7 +40,7 @@ download_release() {
 	version="$1"
 	filename="$2"
 
-	url="$GH_REPO/archive/refs/tags/v${version}.zip"
+	url="$GH_REPO/archive/refs/tags/${version}.zip"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -55,18 +55,30 @@ install_version() {
 		fail "asdf-$TOOL_NAME supports release installs only"
 	fi
 
+	local release_file="$install_path/$TOOL_NAME-$version.tar.gz"
+
 	(
 		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+		download_release "$version" "$release_file"
+	    unzip $release_file -d "${install_path}" || fail "Could not extract $release_file"
+		swift build -c release --package-path ${install_path}/$TOOL_NAME-$version
+		cp ${install_path}/$TOOL_NAME-$version/.build/release/protoc-gen-swift $install_path/protoc-gen-swift
 
-		# TODO: Assert swift-protobuf executable exists.
-		local tool_cmd
-		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
-		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
+		chmod +x $install_path/protoc-gen-swift		
+		rm -rf "$release_file"
+		rm -rf "$install_path/$TOOL_NAME-$version"
+		
+		test -x "$install_path/protoc-gen-swift" || fail "Expected $install_path/bin/protoc-gen-swift to be executable."
+
+		# cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+
+		# local tool_cmd
+		# tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+		# test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
 
 		echo "$TOOL_NAME $version installation was successful!"
 	) || (
-		rm -rf "$install_path"
+		# rm -rf "$install_path"
 		fail "An error occurred while installing $TOOL_NAME $version."
 	)
 }
