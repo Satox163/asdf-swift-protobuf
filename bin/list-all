@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
+set -e
 
-set -euo pipefail
-
-# shellcheck source=../lib/utils.bash
-source "$(dirname "$0")/../lib/utils.bash"
-
-list_all_versions | sort_versions | xargs echo
+curl -s "https://api.github.com/repos/apple/swift-protobuf/tags" | jq -r '.[].name'
