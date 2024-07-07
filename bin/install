@@ -15,6 +15,7 @@ fi
 
 git clone https://github.com/apple/swift-protobuf.git
 cd swift-protobuf
+git fetch --all
 git checkout tags/$VERSION
 
 swift build -c release
