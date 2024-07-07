@@ -8,20 +8,16 @@ INSTALL_PATH="$ASDF_INSTALL_PATH/$PLUGIN_NAME/$VERSION"
 mkdir -p $INSTALL_PATH
 cd $INSTALL_PATH
 
-# Установите Swift, если он еще не установлен
 if ! command -v swift &> /dev/null; then
   echo "Swift is not installed. Please install Swift and try again."
   exit 1
 fi
 
-# Клонируйте репозиторий и перейдите к нужному тегу
 git clone https://github.com/apple/swift-protobuf.git
 cd swift-protobuf
 git checkout tags/$VERSION
 
-# Соберите проект
 swift build -c release
 
-# Переместите бинарный файл в нужное место
 cp .build/release/protoc-gen-swift $INSTALL_PATH/
 chmod +x $INSTALL_PATH/protoc-gen-swift
