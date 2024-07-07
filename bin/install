@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
+set -e
 
-set -euo pipefail
+PLUGIN_NAME="swift-protobuf"
+VERSION="$1"
+INSTALL_PATH="$ASDF_INSTALL_PATH/$PLUGIN_NAME/$VERSION"
 
-current_script_path=${BASH_SOURCE[0]}
-plugin_dir=$(dirname "$(dirname "$current_script_path")")
+mkdir -p $INSTALL_PATH
+cd $INSTALL_PATH
 
-# shellcheck source=./lib/utils.bash
-source "${plugin_dir}/lib/utils.bash"
+# Установите Swift, если он еще не установлен
+if ! command -v swift &> /dev/null; then
+  echo "Swift is not installed. Please install Swift and try again."
+  exit 1
+fi
 
-install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
+# Клонируйте репозиторий и перейдите к нужному тегу
+git clone https://github.com/apple/swift-protobuf.git
+cd swift-protobuf
+git checkout tags/$VERSION
+
+# Соберите проект
+swift build -c release
+
+# Переместите бинарный файл в нужное место
+cp .build/release/protoc-gen-swift $INSTALL_PATH/
+chmod +x $INSTALL_PATH/protoc-gen-swift
